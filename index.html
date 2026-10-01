@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Cadê Meu? | Achados e Perdidos</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <!-- CABEÇALHO -->
+
+    <header>
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                🔎
+            </div>
+
+            <div>
+                <h1>CADÊ <span>MEU?</span></h1>
+
+                <p>
+                    Achados e Perdidos da Escola
+                </p>
+            </div>
+
+        </div>
+
+        <div class="header-message">
+            🏫 Sistema escolar
+        </div>
+
+    </header>
+
+
+    <main>
+
+
+        <!-- HERO -->
+
+        <section class="hero">
+
+            <div class="hero-content">
+
+                <span class="mini-title">
+                    ACHADOS E PERDIDOS
+                </span>
+
+                <h2>
+                    Perdeu alguma coisa?
+                    <br>
+
+                    <span>
+                        Talvez alguém tenha encontrado!
+                    </span>
+                </h2>
+
+                <p>
+                    Cadastre objetos perdidos ou encontrados
+                    dentro da escola e ajude seus colegas
+                    a recuperá-los.
+                </p>
+
+                <a href="#cadastro" class="hero-button">
+                    Cadastrar objeto →
+                </a>
+
+            </div>
+
+
+            <div class="hero-illustration">
+
+                <div class="circle green-circle">
+                    🎒
+                </div>
+
+                <div class="circle orange-circle">
+                    🔑
+                </div>
+
+                <div class="circle small-circle">
+                    ✏️
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- CADASTRO -->
+
+        <section class="cadastro" id="cadastro">
+
+            <div class="section-heading">
+
+                <div class="heading-icon">
+                    +
+                </div>
+
+                <div>
+
+                    <span>
+                        NOVO REGISTRO
+                    </span>
+
+                    <h2>
+                        Cadastrar objeto
+                    </h2>
+
+                    <p>
+                        Encontrou ou perdeu alguma coisa?
+                        Registre aqui.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <form
+                action="/cadastrar"
+                method="POST"
+                id="formCadastro"
+            >
+
+                <div class="form-grid">
+
+
+                    <!-- NOME -->
+
+                    <div class="campo">
+
+                        <label for="nome">
+                            Nome do objeto
+                        </label>
+
+                        <input
+                            type="text"
+                            id="nome"
+                            name="nome"
+                            placeholder="Ex.: Garrafa verde"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- LOCAL -->
+
+                    <div class="campo">
+
+                        <label for="local">
+                            Local
+                        </label>
+
+                        <input
+                            type="text"
+                            id="local"
+                            name="local"
+                            placeholder="Ex.: Quadra da escola"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- DESCRIÇÃO -->
+
+                    <div class="campo campo-grande">
+
+                        <label for="descricao">
+                            Descrição do objeto
+                        </label>
+
+                        <textarea
+                            id="descricao"
+                            name="descricao"
+                            placeholder="Informe cor, marca, características..."
+                            required
+                        ></textarea>
+
+                    </div>
+
+
+                    <!-- DATA -->
+
+                    <div class="campo">
+
+                        <label for="data">
+                            Data
+                        </label>
+
+                        <input
+                            type="date"
+                            id="data"
+                            name="data"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- ALUNO -->
+
+                    <div class="campo">
+
+                        <label for="aluno">
+                            Nome do aluno
+                        </label>
+
+                        <input
+                            type="text"
+                            id="aluno"
+                            name="aluno"
+                            placeholder="Seu nome"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- CONTATO -->
+
+                    <div class="campo">
+
+                        <label for="contato">
+                            Contato
+                        </label>
+
+                        <input
+                            type="text"
+                            id="contato"
+                            name="contato"
+                            placeholder="Telefone ou e-mail"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div class="campo">
+
+                        <label for="status">
+                            Situação
+                        </label>
+
+                        <select
+                            id="status"
+                            name="status"
+                            required
+                        >
+
+                            <option value="Perdido">
+                                🔴 Perdi este objeto
+                            </option>
+
+                            <option value="Encontrado">
+                                🟢 Encontrei este objeto
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="botao-cadastrar"
+                >
+                    Cadastrar objeto
+                    <span>→</span>
+                </button>
+
+            </form>
+
+        </section>
+
+
+
+        <!-- LISTAGEM -->
+
+        <section class="objetos">
+
+            <div class="objetos-topo">
+
+                <div>
+
+                    <span class="mini-title">
+                        REGISTROS DA ESCOLA
+                    </span>
+
+                    <h2>
+                        Objetos cadastrados
+                    </h2>
+
+                </div>
+
+
+                <!-- FILTROS -->
+
+                <div class="filtros">
+
+                    <button
+                        class="filtro ativo"
+                        data-filtro="Todos"
+                    >
+                        Todos
+                    </button>
+
+                    <button
+                        class="filtro"
+                        data-filtro="Perdido"
+                    >
+                        🔴 Perdidos
+                    </button>
+
+                    <button
+                        class="filtro"
+                        data-filtro="Encontrado"
+                    >
+                        🟢 Encontrados
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- CARDS -->
+
+            <div
+                class="lista-objetos"
+                id="listaObjetos"
+            >
+
+                {% if objetos %}
+
+                    {% for objeto in objetos %}
+
+                    <article
+                        class="objeto-card"
+                        data-status="{{ objeto['status'] }}"
+                    >
+
+                        <div class="card-topo">
+
+                            {% if objeto['status'] == 'Perdido' %}
+
+                                <span class="status perdido">
+                                    🔴 PERDIDO
+                                </span>
+
+                            {% else %}
+
+                                <span class="status encontrado">
+                                    🟢 ENCONTRADO
+                                </span>
+
+                            {% endif %}
+
+                            <span class="numero">
+                                #{{ objeto['id'] }}
+                            </span>
+
+                        </div>
+
+
+                        <h3>
+                            {{ objeto['nome'] }}
+                        </h3>
+
+
+                        <p class="descricao">
+                            {{ objeto['descricao'] }}
+                        </p>
+
+
+                        <div class="informacoes">
+
+                            <div class="informacao">
+
+                                <span class="icone">
+                                    📍
+                                </span>
+
+                                <div>
+
+                                    <small>
+                                        LOCAL
+                                    </small>
+
+                                    <strong>
+                                        {{ objeto['local'] }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="informacao">
+
+                                <span class="icone">
+                                    📅
+                                </span>
+
+                                <div>
+
+                                    <small>
+                                        DATA
+                                    </small>
+
+                                    <strong>
+                                        {{ objeto['data'] }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="informacao">
+
+                                <span class="icone">
+                                    👤
+                                </span>
+
+                                <div>
+
+                                    <small>
+                                        ALUNO
+                                    </small>
+
+                                    <strong>
+                                        {{ objeto['aluno'] }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="informacao">
+
+                                <span class="icone">
+                                    📱
+                                </span>
+
+                                <div>
+
+                                    <small>
+                                        CONTATO
+                                    </small>
+
+                                    <strong>
+                                        {{ objeto['contato'] }}
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="acoes">
+
+
+                            <form
+                                action="/alterar/{{ objeto['id'] }}"
+                                method="POST"
+                            >
+
+                                <button
+                                    class="botao-status"
+                                    type="submit"
+                                >
+
+                                    {% if objeto['status'] == 'Perdido' %}
+
+                                        Marcar como encontrado
+
+                                    {% else %}
+
+                                        Marcar como perdido
+
+                                    {% endif %}
+
+                                </button>
+
+                            </form>
+
+
+                            <form
+                                action="/excluir/{{ objeto['id'] }}"
+                                method="POST"
+                                onsubmit="return confirmarExclusao()"
+                            >
+
+                                <button
+                                    class="botao-excluir"
+                                    type="submit"
+                                >
+                                    🗑
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </article>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="sem-objetos">
+
+                        <div class="sem-objetos-icon">
+                            🎒
+                        </div>
+
+                        <h3>
+                            Nenhum objeto cadastrado
+                        </h3>
+
+                        <p>
+                            Seja o primeiro a cadastrar
+                            um objeto perdido ou encontrado!
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- RODAPÉ -->
+
+    <footer>
+
+        <div>
+
+            <strong>
+                CADÊ MEU?
+            </strong>
+
+            <span>
+                • Achados e Perdidos da Escola
+            </span>
+
+        </div>
+
+        <p>
+            Projeto escolar
+        </p>
+
+    </footer>
+
+
+    <script
+        src="{{ url_for('static', filename='script.js') }}">
+    </script>
+
+</body>
+
+</html>
