@@ -1,132 +1,265 @@
-from flask import Flask, render_template, request, redirect
-import sqlite3
+const form = document.getElementById("formCadastro");
 
-app = Flask(__name__)
+const objectsGrid = document.getElementById("objectsGrid");
 
-DATABASE = "cade_meu.db"
+const filters = document.querySelectorAll(".filter");
 
-
-def conectar():
-    banco = sqlite3.connect(DATABASE)
-    banco.row_factory = sqlite3.Row
-    return banco
+let objects = JSON.parse(
+    localStorage.getItem("cadeMeuObjetos")
+) || [];
 
 
-def criar_banco():
-    banco = conectar()
+// CADASTRAR OBJETO
 
-    banco.execute("""
-        CREATE TABLE IF NOT EXISTS objetos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome TEXT NOT NULL,
-            descricao TEXT NOT NULL,
-            local TEXT NOT NULL,
-            data TEXT NOT NULL,
-            aluno TEXT NOT NULL,
-            contato TEXT NOT NULL,
-            status TEXT NOT NULL
-        )
-    """)
+form.addEventListener("submit", function (event) {
 
-    banco.commit()
-    banco.close()
+    event.preventDefault();
 
+    const objeto = {
 
-@app.route("/")
-def inicio():
+        id: Date.now(),
 
-    banco = conectar()
+        nome: document.getElementById("nome").value,
 
-    objetos = banco.execute(
-        "SELECT * FROM objetos ORDER BY id DESC"
-    ).fetchall()
+        local: document.getElementById("local").value,
 
-    banco.close()
+        descricao: document.getElementById("descricao").value,
 
-    return render_template(
-        "index.html",
-        objetos=objetos
-    )
+        data: document.getElementById("data").value,
+
+        aluno: document.getElementById("aluno").value,
+
+        contato: document.getElementById("contato").value,
+
+        status: document.getElementById("status").value
+
+    };
 
 
-@app.route("/cadastrar", methods=["POST"])
-def cadastrar():
+    objects.push(objeto);
 
-    nome = request.form["nome"]
-    descricao = request.form["descricao"]
-    local = request.form["local"]
-    data = request.form["data"]
-    aluno = request.form["aluno"]
-    contato = request.form["contato"]
-    status = request.form["status"]
-
-    banco = conectar()
-
-    banco.execute("""
-        INSERT INTO objetos
-        (nome, descricao, local, data, aluno, contato, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (
-        nome,
-        descricao,
-        local,
-        data,
-        aluno,
-        contato,
-        status
-    ))
-
-    banco.commit()
-    banco.close()
-
-    return redirect("/")
+    localStorage.setItem(
+        "cadeMeuObjetos",
+        JSON.stringify(objects)
+    );
 
 
-@app.route("/alterar/<int:id>", methods=["POST"])
-def alterar(id):
+    form.reset();
 
-    banco = conectar()
+    renderObjects();
 
-    objeto = banco.execute(
-        "SELECT status FROM objetos WHERE id = ?",
-        (id,)
-    ).fetchone()
+    alert("Objeto cadastrado com sucesso! 💚");
 
-    if objeto:
-
-        if objeto["status"] == "Perdido":
-            novo_status = "Encontrado"
-        else:
-            novo_status = "Perdido"
-
-        banco.execute(
-            "UPDATE objetos SET status = ? WHERE id = ?",
-            (novo_status, id)
-        )
-
-        banco.commit()
-
-    banco.close()
-
-    return redirect("/")
+});
 
 
-@app.route("/excluir/<int:id>", methods=["POST"])
-def excluir(id):
+// MOSTRAR OBJETOS
 
-    banco = conectar()
+function renderObjects(filtro = "Todos") {
 
-    banco.execute(
-        "DELETE FROM objetos WHERE id = ?",
-        (id,)
-    )
+    const cadastrados = objects.filter(function (objeto) {
 
-    banco.commit()
-    banco.close()
+        return filtro === "Todos" ||
+               objeto.status === filtro;
 
-    return redirect("/")
+    });
 
 
-if __name__ == "__main__":
-    criar_banco()
-    app.run(debug=True)
+    // Mantém os três exemplos se não houver objetos cadastrados
+
+    if (objects.length === 0) {
+        updateStats();
+        return;
+    }
+
+
+    objectsGrid.innerHTML = "";
+
+
+    cadastrados.forEach(function (objeto, index) {
+
+        const card = document.createElement("article");
+
+        card.className = "object-card";
+
+
+        const dataFormatada =
+            objeto.data
+            ? objeto.data.split("-").reverse().join("/")
+            : "";
+
+
+        const statusClass =
+            objeto.status === "Perdido"
+            ? "lost"
+            : "found";
+
+
+        const statusTexto =
+            objeto.status === "Perdido"
+            ? "● PERDIDO"
+            : "● ENCONTRADO";
+
+
+        card.innerHTML = `
+
+            <div class="card-header">
+
+                <span class="status ${statusClass}">
+                    ${statusTexto}
+                </span>
+
+                <span class="number">
+                    #${String(index + 1).padStart(3, "0")}
+                </span>
+
+            </div>
+
+            <div class="object-icon">
+                📦
+            </div>
+
+            <h3>
+                ${objeto.nome}
+            </h3>
+
+            <p>
+                ${objeto.descricao}
+            </p>
+
+            <div class="details">
+
+                <div>
+
+                    <span>📍</span>
+
+                    <div>
+
+                        <small>LOCAL</small>
+
+                        <strong>
+                            ${objeto.local}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div>
+
+                    <span>📅</span>
+
+                    <div>
+
+                        <small>DATA</small>
+
+                        <strong>
+                            ${dataFormatada}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div>
+
+                    <span>👤</span>
+
+                    <div>
+
+                        <small>ALUNO</small>
+
+                        <strong>
+                            ${objeto.aluno}
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <button
+                class="contact-button"
+                onclick="mostrarContato('${objeto.contato}')"
+            >
+                Ver contato
+            </button>
+
+        `;
+
+
+        objectsGrid.appendChild(card);
+
+    });
+
+
+    updateStats();
+
+}
+
+
+// FILTROS
+
+filters.forEach(function (filter) {
+
+    filter.addEventListener("click", function () {
+
+        filters.forEach(function (button) {
+
+            button.classList.remove("active");
+
+        });
+
+
+        filter.classList.add("active");
+
+
+        const filtro =
+            filter.getAttribute("data-filter");
+
+
+        renderObjects(filtro);
+
+    });
+
+});
+
+
+// ESTATÍSTICAS
+
+function updateStats() {
+
+    document.getElementById("totalObjetos").textContent =
+        objects.length;
+
+    document.getElementById("totalPerdidos").textContent =
+        objects.filter(
+            objeto => objeto.status === "Perdido"
+        ).length;
+
+    document.getElementById("totalEncontrados").textContent =
+        objects.filter(
+            objeto => objeto.status === "Encontrado"
+        ).length;
+
+}
+
+
+// CONTATO
+
+function mostrarContato(contato) {
+
+    alert(
+        "Entre em contato com o aluno através de:\n\n" +
+        contato
+    );
+
+}
+
+
+// PRIMEIRA EXECUÇÃO
+
+updateStats();
